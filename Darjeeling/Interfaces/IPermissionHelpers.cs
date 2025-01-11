@@ -1,6 +1,8 @@
+using NetCord;
+
 namespace Darjeeling.Interfaces;
 
-public class IPermissionHelpers
+public interface IPermissionHelpers
 {
-    
+    Task<Channel>? CanAccessChannel(ulong channelId);
 }

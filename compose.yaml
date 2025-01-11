@@ -1,0 +1,6 @@
+﻿services:
+  darjeeling:
+    image: darjeeling
+    build:
+      context: .
+      dockerfile: Darjeeling/Dockerfile

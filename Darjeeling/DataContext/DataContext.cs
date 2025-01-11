@@ -10,6 +10,10 @@ public class DataContext : DbContext
     public DbSet<FCMember> FCMembers { get; set; }
     public DbSet<NameHistory> NameHistories { get; set; }
     
+    public DataContext(DbContextOptions<DataContext> options) : base(options)
+    {
+    }
+    
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
