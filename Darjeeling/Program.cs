@@ -1,8 +1,10 @@
 using System.Collections.Immutable;
 using Darjeeling.Helpers;
+using Darjeeling.Helpers.LodestoneHelpers;
 using Darjeeling.Interfaces;
 using Darjeeling.Models;
 using Darjeeling.Repositories;
+using Darjeeling.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NetCord;
@@ -23,6 +25,7 @@ public class Program
         Console.WriteLine("Starting Discord Bot....");
         
         var botToken = Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN");
+        botToken = "";
         if (string.IsNullOrEmpty(botToken))
         {
             await Console.Error.WriteLineAsync("DISCORD_BOT_TOKEN environment variable is not set.");
@@ -30,11 +33,21 @@ public class Program
         }
         
         var postgresConnectionString = Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING");
-        if (string.IsNullOrEmpty(postgresConnectionString))
-        {
-            await Console.Error.WriteLineAsync("POSTGRES_CONNECTION_STRING environment variable is not set.");
-            throw new InvalidOperationException("POSTGRES_CONNECTION_STRING environment variable is not set.");
-        }
+        postgresConnectionString = "Host=localhost;Database=;Username=;Password=;";
+        
+        // if (string.IsNullOrEmpty(postgresConnectionString))
+        // {
+        //     await Console.Error.WriteLineAsync("POSTGRES_CONNECTION_STRING environment variable is not set.");
+        //     throw new InvalidOperationException("POSTGRES_CONNECTION_STRING environment variable is not set.");
+        // }
+        //
+        
+        // var discordChannelId = Environment.GetEnvironmentVariable("DISCORD_CHANNEL_ID");
+        // if (string.IsNullOrEmpty(discordChannelId) || !ulong.TryParse(discordChannelId, out _))
+        // {
+        //     await Console.Error.WriteLineAsync("DISCORD_CHANNEL_ID environment variable is not set");
+        //     throw new InvalidOperationException("DISCORD_CHANNEL_ID environment variable is not set");
+        // }
         
         // Build Host
         var builder = Host.CreateApplicationBuilder(args);
@@ -58,40 +71,42 @@ public class Program
             logging.AddDebug();
             logging.SetMinimumLevel(LogLevel.Trace);
         });
-        
+
         // Configure AppConfiguration (bot tokens, etc)
-        services.Configure<AppConfiguration>(options =>
-        {
-            options.botToken = botToken;
-        });
-        
+        services.Configure<AppConfiguration>(options => { options.botToken = botToken; });
+
         // Bot Related Services
-        services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<IOptions<AppConfiguration>>().Value);
+        services.AddSingleton(serviceProvider =>
+            serviceProvider.GetRequiredService<IOptions<AppConfiguration>>().Value);
         services.AddSingleton<IPermissionHelpers, PermissionHelpers>();
         services.AddSingleton<ILodestoneApi, LodestoneApi>();
+        services.AddSingleton<IMappingHelper, MappingHelper>();
+        services.AddSingleton<IDomainService, DomainService>();
 
-        
+
         // Intents
         services.AddDiscordGateway(options =>
         {
-            options.Intents = GatewayIntents.GuildMessages 
-                              | GatewayIntents.DirectMessages 
-                              | GatewayIntents.MessageContent 
+            options.Intents = GatewayIntents.GuildMessages
+                              | GatewayIntents.GuildUsers
+                              | GatewayIntents.DirectMessages
+                              | GatewayIntents.MessageContent
                               | GatewayIntents.Guilds;
             options.Token = botToken;
         });
-        
+
         // Slash Command Service
         services.AddApplicationCommands<SlashCommandInteraction, SlashCommandContext, AutocompleteInteractionContext>();
-        
+
         // Rest Client to support API interaction without responding to an interaction first.
         services.AddSingleton<RestClient>(serviceProvider =>
         {
             var environmentOptions = serviceProvider.GetRequiredService<IOptions<AppConfiguration>>().Value;
             return new RestClient(environmentOptions.EntityToken);
         });
+        
     }
-
+    
     private static void ConfigureHost(IHost host)
     {
         // Additional NetCord Configuration - AddModules to automatically register command modules

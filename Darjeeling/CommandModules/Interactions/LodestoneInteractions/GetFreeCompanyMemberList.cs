@@ -23,21 +23,20 @@ public class GetFreeCompanyMemberList : ApplicationCommandModule<SlashCommandCon
             _logger.LogActionTraceStart(Context, "ReturnFreeCompanyMemberList");
             await Context.Interaction.SendResponseAsync(InteractionCallback.DeferredMessage());
             
-            var webResult = await _lodestoneApi.GetLodestoneFreeCompanyMembersAsync(fcid);
+            var webResult = await _lodestoneApi.GetLodestoneFreeCompanyMembers(fcid);
             
             if (webResult.Success == false)
             {
                 await Context.Interaction.SendFollowupMessageAsync(new InteractionMessageProperties
                 {
-                    Content = webResult.Error
+                    Content = $"Error occured when running getfreecompanylist command"
                 });
             }
             else
             {
-                var combinedMemberNames = string.Join(", ", webResult.Members.Select(x => x.FullName));
                 await Context.Interaction.SendFollowupMessageAsync(new InteractionMessageProperties
                 {
-                    Content = $"Free Company Member List for {fcid} is: {combinedMemberNames}"
+                    Content = $"Free Company Member List for {webResult.FreeCompanyName} is: {webResult.ConcatenatedMembers}"
                 });
             }
             _logger.LogActionTraceFinish(Context, "ReturnFreeCompanyMemberList");

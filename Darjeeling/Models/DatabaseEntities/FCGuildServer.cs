@@ -8,6 +8,9 @@ public class FCGuildServer
     public DateTime DateCreated { get; set; }
     public ICollection<FCMember> FCMembers { get; set; }
     
+    public string DiscordGuildName { get; set; }
+    public string FreeCompanyName { get; set; }
+    
     // Role to control who can run administrative commands
     public FCGuildRole FCAdminRole { get; set; }
     

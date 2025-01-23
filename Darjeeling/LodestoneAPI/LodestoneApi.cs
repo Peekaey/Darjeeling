@@ -30,17 +30,17 @@ public class LodestoneApi : ILodestoneApi
         return $"https://na.finalfantasyxiv.com/lodestone/freecompany/{freeCompanyId}/member/?page=";
     }
 
-    public async Task<WebResult> GetLodestoneFreeCompanyAsync(string firstName, string lastName, string world)
+    public async Task<LodestoneWebResult> GetLodestoneCharacterFreeCompany(string firstName, string lastName, string world)
     {
         
         try
         {
             var queryUrl = GenerateCharacterSearchQueryURL(firstName, lastName, world);
-            var content = await GetLodestoneWebPageContentAsync(queryUrl);
+            var content = await GetLodestoneWebPageContent(queryUrl);
 
             if (string.IsNullOrEmpty(content))
             {
-                return new WebResult { Success = false, ResultValue = "Unable to get web content" };
+                return LodestoneWebResult.AsFailure("Unable to get web content");
             }
 
             var context = BrowsingContext.New(Configuration.Default);
@@ -49,48 +49,48 @@ public class LodestoneApi : ILodestoneApi
             var linkElement = document.QuerySelector("a.entry__link");
             if (linkElement == null)
             {
-                return new WebResult { Success = false, ResultValue = "No Character found with this name on the specified world" };
+                return LodestoneWebResult.AsFailure("No Character found with this name on the specified world");
             }
 
             var href = linkElement.GetAttribute("href");
             if (string.IsNullOrEmpty(href))
             {
-                return new WebResult { Success = false, ResultValue = "Error Getting Character URL" };
+                return LodestoneWebResult.AsFailure("Error Getting Character URL");
             }
 
             var match = Regex.Match(href, @"/lodestone/character/(\d+)/");
             if (!match.Success)
             {
-                return new WebResult { Success = false, ResultValue = "Error Parsing Character ID" };
+                return LodestoneWebResult.AsFailure("Error Parsing Character ID");
             }
             
             var freeCompanyElement = document.QuerySelector("a.entry__freecompany__link span");
             if (freeCompanyElement == null)
             {
-                return new WebResult { Success = false, ResultValue = "Character not in a free company" };
+                return LodestoneWebResult.AsFailure("Character not in a free company");
             }
 
             string freeCompany = freeCompanyElement.TextContent;
-            return new WebResult { Success = true, ResultValue = freeCompany };
+            return LodestoneWebResult.AsSuccess(freeCompany);
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine("Error getting Free Company: " + ex);
-            return new WebResult { Success = false, ResultValue = $"Error: {ex.Message}" };
+            return LodestoneWebResult.AsFailure($"Exception occured when getting Free Company");
         }
     }
 
-    public async Task<WebResult> GetLodestoneCharacterIdAsync(string firstName, string lastName, string world)
+    public async Task<LodestoneWebResult> GetLodestoneCharacterId(string firstName, string lastName, string world)
     {
         
         try
         {
             var queryUrl = GenerateCharacterSearchQueryURL(firstName, lastName, world);
-            var content = await GetLodestoneWebPageContentAsync(queryUrl);
+            var content = await GetLodestoneWebPageContent(queryUrl);
 
             if (string.IsNullOrEmpty(content))
             {
-                return new WebResult { Success = false, ResultValue = "Unable to get web content" };
+                LodestoneWebResult.AsFailure("Unable to get web content");
             }
 
             var context = BrowsingContext.New(Configuration.Default);
@@ -99,7 +99,7 @@ public class LodestoneApi : ILodestoneApi
             var linkElement = document.QuerySelector("a.entry__link");
             if (linkElement == null)
             {
-                return new WebResult { Success = false, ResultValue = "No Character found with this name on the specified world" };
+                return LodestoneWebResult.AsFailure("No Character found with this name on the specified world");
             }
 
             var href = linkElement.GetAttribute("href");
@@ -107,28 +107,26 @@ public class LodestoneApi : ILodestoneApi
 
             if (!match.Success)
             {
-                return new WebResult { Success = false, ResultValue = "Error Parsing Character ID" };
+                return LodestoneWebResult.AsFailure("Error Parsing Character ID");
             }
-
-            return new WebResult { Success = true, ResultValue = match.Groups[1].Value };
+            return LodestoneWebResult.AsSuccess(match.Groups[1].Value);
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine("Exception getting Character ID: " + ex);
-            return new WebResult { Success = false, 
-                ResultValue = $"Error Exception getting character ID, please check logs for more information" };
+            return LodestoneWebResult.AsFailure($"Error: {ex.Message}");
         }
     }
 
-    public async Task<LodestoneFCMemberList> GetLodestoneFreeCompanyMembersAsync(string fcid)
+    public async Task<LodestoneFCWebResult> GetLodestoneFreeCompanyMembers(string fcid)
     {
         var memberList = new List<LodestoneFCMember>();
         string initialUrl = GenerateFreeCompanySearchQueryURL(fcid);
 
-        string content = await GetLodestoneWebPageContentAsync(initialUrl);
+        string content = await GetLodestoneWebPageContent(initialUrl);
         if (string.IsNullOrEmpty(content))
         {
-            return new LodestoneFCMemberList { Success = false, Error = "Error getting initial Free Company page", Members = new List<LodestoneFCMember>() };
+            return LodestoneFCWebResult.AsFailure("Error getting initial Free Company page");
         }
 
         var context = BrowsingContext.New(Configuration.Default);
@@ -138,23 +136,25 @@ public class LodestoneApi : ILodestoneApi
 
         if (totalPageCount == 0)
         {
-            return new LodestoneFCMemberList { Success = false, Error = "Error calculating page count", Members = new List<LodestoneFCMember>() };
+            return LodestoneFCWebResult.AsFailure("Error calculating page count");
         }
+        
+        var freeCompanyName = GetLodestoneFreeCompanyName(document);
+
 
         for (int currentPage = 1; currentPage <= totalPageCount; currentPage++)
         {
             string urlQuery = $"{initialUrl}{currentPage}";
-            memberList.AddRange(await GetMembersFromFreeCompanyProfileAsync(urlQuery));
+            memberList.AddRange(await GetMembersFromFreeCompanyProfile(urlQuery));
         }
-
-        return new LodestoneFCMemberList { Success = true, Error = "", Members = memberList };
+        return LodestoneFCWebResult.AsSuccess(freeCompanyName, memberList);
     }
 
-    private async Task<List<LodestoneFCMember>> GetMembersFromFreeCompanyProfileAsync(string url)
+    private async Task<List<LodestoneFCMember>> GetMembersFromFreeCompanyProfile(string url)
     {
         var members = new List<LodestoneFCMember>();
 
-        string content = await GetLodestoneWebPageContentAsync(url);
+        string content = await GetLodestoneWebPageContent(url);
         if (string.IsNullOrEmpty(content))
         {
             return members;
@@ -162,7 +162,7 @@ public class LodestoneApi : ILodestoneApi
 
         var context = BrowsingContext.New(Configuration.Default);
         var document = await context.OpenAsync(req => req.Content(content));
-
+        
         foreach (var element in document.QuerySelectorAll("a.entry__bg"))
         {
             var href = element.GetAttribute("href");
@@ -198,7 +198,20 @@ public class LodestoneApi : ILodestoneApi
         return match.Success ? int.Parse(match.Groups[1].Value) : 0;
     }
 
-    private async Task<string> GetLodestoneWebPageContentAsync(string url)
+    private string GetLodestoneFreeCompanyName(IDocument document)
+    {
+        var freeCompanyNameElement = document.QuerySelector(".entry__freecompany__name");
+
+        if (freeCompanyNameElement == null)
+        {
+            return "";
+        }
+
+        var match = freeCompanyNameElement.TextContent;
+        return match;
+    }
+
+    private async Task<string> GetLodestoneWebPageContent(string url)
     {
         try
         {

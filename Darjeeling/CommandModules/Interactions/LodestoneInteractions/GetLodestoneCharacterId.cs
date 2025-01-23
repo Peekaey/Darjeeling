@@ -26,7 +26,7 @@ public class GetLodestoneCharacterId : ApplicationCommandModule<SlashCommandCont
             _logger.LogActionTraceStart(Context, "ReturnLodestoneCharacterId");
             await Context.Interaction.SendResponseAsync(InteractionCallback.DeferredMessage());
             
-            var webResult = await _lodestoneApi.GetLodestoneCharacterIdAsync(firstName, lastName, world);
+            var webResult = await _lodestoneApi.GetLodestoneCharacterId(firstName, lastName, world);
 
             if (webResult.Success == false)
             {

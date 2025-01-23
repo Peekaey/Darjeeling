@@ -24,7 +24,7 @@ public class GetCharacterFreeCompany : ApplicationCommandModule<SlashCommandCont
             _logger.LogActionTraceStart(Context, "ReturnCharacterFreeCompany");
             await Context.Interaction.SendResponseAsync(InteractionCallback.DeferredMessage());
             
-            var webResult = await _lodestoneApi.GetLodestoneFreeCompanyAsync(firstName, lastName, world);
+            var webResult = await _lodestoneApi.GetLodestoneCharacterFreeCompany(firstName, lastName, world);
 
             if (webResult.Success == false)
             {

@@ -5,8 +5,8 @@ namespace Darjeeling.Interfaces;
 
 public interface ILodestoneApi
 {
-    Task<WebResult> GetLodestoneFreeCompanyAsync(string firstName, string lastName, string world);
-    Task<WebResult> GetLodestoneCharacterIdAsync(string firstName, string lastName, string world);
-    Task<LodestoneFCMemberList> GetLodestoneFreeCompanyMembersAsync(string fcid);
+    Task<LodestoneWebResult> GetLodestoneCharacterFreeCompany(string firstName, string lastName, string world);
+    Task<LodestoneWebResult> GetLodestoneCharacterId(string firstName, string lastName, string world);
+    Task<LodestoneFCWebResult> GetLodestoneFreeCompanyMembers(string fcid);
 
 }
