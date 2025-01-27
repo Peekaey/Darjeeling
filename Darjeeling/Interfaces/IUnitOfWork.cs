@@ -7,7 +7,7 @@ public interface IUnitOfWork : IDisposable
     IFCGuildMemberRepository FCGuildMemberRepository { get; }
     IFCGuildServerRepository FCGuildServerRepository { get; }
     IFCGuildRoleRepository FCGuildRoleRepository { get; }
-    INameHistoryRepository NameHistoryRepository { get; }
+    ILodestoneNameHistoryRepository LodestoneNameHistoryRepository { get; }
 
     Task<int> SaveChangesAsync();
     void SaveChanges();

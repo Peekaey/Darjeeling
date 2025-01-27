@@ -9,35 +9,57 @@ namespace Darjeeling.Helpers;
 
 public class MappingHelper : IMappingHelper
 {
-    public async Task<List<FCGuildMember>> MapLodestoneFCMembersToFCMembers(List<LodestoneFCMember> lodestoneFcMembers)
+    public async Task<List<FCGuildMember>> MapLodestoneFCMembersToFCMembers(List<LodestoneFCMember> lodestoneFcMembers, List<GuildUser> guildUsers)
     {
         var fcMembers = new List<FCGuildMember>();
-
         if (lodestoneFcMembers != null && lodestoneFcMembers.Any())
         {
+            var lodestoneMemberDict = lodestoneFcMembers.ToDictionary(
+                m => m.FirstName.ToLower() + " " + m.LastName.ToLower(),
+                m => m
+            );
 
-            foreach (var loddestoneFcMember in lodestoneFcMembers)
+            foreach (var member in guildUsers)
             {
-                fcMembers.Add(new FCGuildMember
+                var memberName = (member.Nickname ?? member.Username).ToLower();
+                foreach (var lodestoneMember in lodestoneMemberDict.Values)
                 {
-
-                    LodestoneId = loddestoneFcMember.CharacterId,
-                    DateCreated = DateTime.UtcNow,
-                    NameHistories = (new List<NameHistory>
+                    if (memberName.Contains(lodestoneMember.FirstName.ToLower()) ||
+                        memberName.Contains(lodestoneMember.LastName.ToLower()))
                     {
-                        new NameHistory
+                        fcMembers.Add(new FCGuildMember
                         {
-                            
-                            FirstName = loddestoneFcMember.FirstName,
-                            LastName = loddestoneFcMember.LastName,
-                            DateAdded = DateTime.UtcNow
-                        }
-                    })
-                });
+                            DiscordUserUId = member.Id.ToString(),
+                            LodestoneId = lodestoneMember.CharacterId,
+                            DateCreated = DateTime.UtcNow,
+                            LodestoneNameHistories = new List<LodestoneNameHistory>
+                            {
+                                new LodestoneNameHistory
+                                {
+                                    FirstName = lodestoneMember.FirstName,
+                                    LastName = lodestoneMember.LastName,
+                                    DateAdded = DateTime.UtcNow
+                                }
+                            },
+                            DiscordNameHistories = new List<DiscordNameHistory>
+                            {
+                                new DiscordNameHistory
+                                {
+                                    DiscordUsername = member.GlobalName,
+                                    DiscordNickName = member.Nickname ?? member.Username,
+                                    DateAdded = DateTime.UtcNow
+                                }
+                            }
+                        });
+                        break;
+                    }
+                }
             }
         }
+
         return fcMembers;
     }
+    
     
     public async Task<FCGuildRole> MapRegisterFCGuildServerDTOToFCGuildRoleAdmin(
         RegisterFCGuildServerDTO registerFcGuildServerDto, Role guildRole)

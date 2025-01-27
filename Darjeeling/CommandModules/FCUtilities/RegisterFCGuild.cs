@@ -64,7 +64,7 @@ public class RegisterFCGuild : ApplicationCommandModule<SlashCommandContext>
                 {
                     await Context.Interaction.SendFollowupMessageAsync(new InteractionMessageProperties
                     {
-                        Content = $"Free Company {webResult.FreeCompanyName} has been successfully registered"
+                        Content = $"Free Company {webResult.FreeCompanyName} has been successfully registered with {registerResult.RegisteredMemberCount} out of {webResult.Members.Count} members identified"
                     });
                 }
                 else

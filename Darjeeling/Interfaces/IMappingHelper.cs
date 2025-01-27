@@ -7,7 +7,7 @@ namespace Darjeeling.Interfaces;
 
 public interface IMappingHelper
 {
-    Task<List<FCGuildMember>> MapLodestoneFCMembersToFCMembers(List<LodestoneFCMember> lodestoneFcMembers);
+    Task<List<FCGuildMember>> MapLodestoneFCMembersToFCMembers(List<LodestoneFCMember> lodestoneFcMembers, List<GuildUser> guildUsers);
 
     Task<FCGuildRole> MapRegisterFCGuildServerDTOToFCGuildRoleAdmin(RegisterFCGuildServerDTO registerFcGuildServerDto,
         Role guildRole);

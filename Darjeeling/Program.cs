@@ -5,6 +5,7 @@ using Darjeeling.Helpers.LodestoneHelpers;
 using Darjeeling.Interfaces;
 using Darjeeling.Interfaces.Repositories;
 using Darjeeling.Models;
+using Darjeeling.Models.Entities;
 using Darjeeling.Repositories;
 using Darjeeling.Services;
 using Microsoft.EntityFrameworkCore;
@@ -84,8 +85,8 @@ public class Program
         services.AddScoped<IFCGuildMemberRepository, FCGuildMemberRepository>();
         services.AddScoped<IFCGuildServerRepository, FCGuildServerRepository>();
         services.AddScoped<IFCGuildRoleRepository, FCGuildRoleRepository>();
-        services.AddScoped<INameHistoryRepository, NameHistoryRepository>();
-        
+        services.AddScoped<ILodestoneNameHistoryRepository, LodestoneNameHistoryRepository>();
+        services.AddScoped<IDiscordNameHistoryRepository, DiscordNameHistoryRepository>();
 
 
         // Intents
