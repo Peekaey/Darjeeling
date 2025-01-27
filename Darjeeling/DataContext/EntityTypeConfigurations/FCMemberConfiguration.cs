@@ -10,10 +10,9 @@ public class FCMemberConfiguration : IEntityTypeConfiguration<FCGuildMember>
     {
         builder.HasKey(fm => fm.Id);
         builder.Property(fm => fm.DiscordUserUId).IsRequired();
-        builder.Property(fm => fm.DiscordUsername).IsRequired();
         builder.Property(fm => fm.LodestoneId).IsRequired(false);
         builder.Property(fm => fm.DateCreated).IsRequired();
-        builder.HasMany(fm => fm.NameHistories)
+        builder.HasMany(fm => fm.LodestoneNameHistories)
             .WithOne(nh => nh.FcGuildMember)
             .HasForeignKey(nh => nh.FCMemberId)
             .OnDelete(DeleteBehavior.Cascade);

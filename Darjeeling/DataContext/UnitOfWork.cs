@@ -12,15 +12,16 @@ public class UnitOfWork : IUnitOfWork
     public IFCGuildMemberRepository FCGuildMemberRepository { get; }
     public IFCGuildServerRepository FCGuildServerRepository { get; }
     public IFCGuildRoleRepository FCGuildRoleRepository { get; }
-    public INameHistoryRepository NameHistoryRepository { get; }
-
+    public ILodestoneNameHistoryRepository LodestoneNameHistoryRepository { get; }
+    public IDiscordNameHistoryRepository DiscordNameHistoryRepository { get; }
     
     public UnitOfWork(Darjeeling.Repositories.DataContext context, 
         ILogger<UnitOfWork> logger,
         IFCGuildMemberRepository fcGuildMemberRepository,
         IFCGuildServerRepository fcGuildServerRepository,
         IFCGuildRoleRepository fcGuildRoleRepository,
-        INameHistoryRepository nameHistoryRepository
+        ILodestoneNameHistoryRepository lodestoneNameHistoryRepository,
+        IDiscordNameHistoryRepository discordNameHistoryRepository
         )
     {
         _context = context;
@@ -29,7 +30,8 @@ public class UnitOfWork : IUnitOfWork
         FCGuildMemberRepository = fcGuildMemberRepository;
         FCGuildServerRepository = fcGuildServerRepository;
         FCGuildRoleRepository = fcGuildRoleRepository;
-        NameHistoryRepository = nameHistoryRepository;
+        LodestoneNameHistoryRepository = lodestoneNameHistoryRepository;
+        DiscordNameHistoryRepository = discordNameHistoryRepository;
     }
     
     public async Task<int> SaveChangesAsync()

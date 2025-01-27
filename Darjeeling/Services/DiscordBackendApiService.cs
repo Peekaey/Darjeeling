@@ -55,5 +55,24 @@ public class DiscordBackendApiService : IDiscordBackendApiService
             return null;
         }
     }
-    
+
+    public async Task<List<GuildUser>> GetGuildMembers(ulong guildId)
+    {
+        try
+        {
+            var memberList = new List<GuildUser>();
+            var members = _restClient.GetGuildUsersAsync(guildId);
+            await foreach (var member in members)
+            {
+                memberList.Add(member);
+            }
+
+            return memberList;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error while getting guild members.");
+            return null;
+        }
+    }
 }
