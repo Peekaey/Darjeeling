@@ -13,7 +13,7 @@ public class NameHistoryConfiguration : IEntityTypeConfiguration<NameHistory>
         builder.Property(nh => nh.FirstName).IsRequired();
         builder.Property(nh => nh.LastName).IsRequired();
         builder.Property(nh => nh.DateAdded).IsRequired();
-        builder.HasOne(nh => nh.FCMember)
+        builder.HasOne(nh => nh.FcGuildMember)
             .WithMany(fm => fm.NameHistories)
             .HasForeignKey(nh => nh.FCMemberId)
             .OnDelete(DeleteBehavior.Cascade);

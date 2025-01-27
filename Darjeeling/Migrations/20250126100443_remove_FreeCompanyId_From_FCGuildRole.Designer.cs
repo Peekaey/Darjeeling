@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Darjeeling.Migrations
 {
     [DbContext(typeof(Repositories.DataContext))]
-    [Migration("20250111211230_initial-schema")]
-    partial class initialschema
+    [Migration("20250126100443_remove_FreeCompanyId_From_FCGuildRole")]
+    partial class remove_FreeCompanyId_From_FCGuildRole
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,72 +25,7 @@ namespace Darjeeling.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Darjeeling.Models.Entities.FCGuildRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("DiscordGuildUid")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("FCGuildServerId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("FreeCompanyId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("RoleType")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FCGuildServerId")
-                        .IsUnique();
-
-                    b.ToTable("FCGuildRoles");
-                });
-
-            modelBuilder.Entity("Darjeeling.Models.Entities.FCGuildServer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AdminRoleId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("DiscordGuildUid")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FCGuildServers");
-                });
-
-            modelBuilder.Entity("Darjeeling.Models.Entities.FCMember", b =>
+            modelBuilder.Entity("Darjeeling.Models.Entities.FCGuildMember", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -123,6 +58,79 @@ namespace Darjeeling.Migrations
                     b.ToTable("FCMembers");
                 });
 
+            modelBuilder.Entity("Darjeeling.Models.Entities.FCGuildRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DiscordGuildUid")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("FCGuildServerId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("RoleType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FCGuildServerId")
+                        .IsUnique();
+
+                    b.ToTable("FCGuildRoles");
+                });
+
+            modelBuilder.Entity("Darjeeling.Models.Entities.FCGuildServer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminChannelId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AdminRoleId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DiscordGuildName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DiscordGuildUid")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FreeCompanyName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FCGuildServers");
+                });
+
             modelBuilder.Entity("Darjeeling.Models.Entities.NameHistory", b =>
                 {
                     b.Property<int>("Id")
@@ -141,6 +149,9 @@ namespace Darjeeling.Migrations
                     b.Property<int>("FCMemberId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("FcGuildMemberId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -151,9 +162,20 @@ namespace Darjeeling.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FCMemberId");
+                    b.HasIndex("FcGuildMemberId");
 
                     b.ToTable("NameHistories");
+                });
+
+            modelBuilder.Entity("Darjeeling.Models.Entities.FCGuildMember", b =>
+                {
+                    b.HasOne("Darjeeling.Models.Entities.FCGuildServer", "FCGuildServer")
+                        .WithMany("FCMembers")
+                        .HasForeignKey("FCGuildServerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FCGuildServer");
                 });
 
             modelBuilder.Entity("Darjeeling.Models.Entities.FCGuildRole", b =>
@@ -167,26 +189,20 @@ namespace Darjeeling.Migrations
                     b.Navigation("FCGuildServer");
                 });
 
-            modelBuilder.Entity("Darjeeling.Models.Entities.FCMember", b =>
-                {
-                    b.HasOne("Darjeeling.Models.Entities.FCGuildServer", "FCGuildServer")
-                        .WithMany("FCMembers")
-                        .HasForeignKey("FCGuildServerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("FCGuildServer");
-                });
-
             modelBuilder.Entity("Darjeeling.Models.Entities.NameHistory", b =>
                 {
-                    b.HasOne("Darjeeling.Models.Entities.FCMember", "FCMember")
+                    b.HasOne("Darjeeling.Models.Entities.FCGuildMember", "FcGuildMember")
                         .WithMany("NameHistories")
-                        .HasForeignKey("FCMemberId")
+                        .HasForeignKey("FcGuildMemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("FCMember");
+                    b.Navigation("FcGuildMember");
+                });
+
+            modelBuilder.Entity("Darjeeling.Models.Entities.FCGuildMember", b =>
+                {
+                    b.Navigation("NameHistories");
                 });
 
             modelBuilder.Entity("Darjeeling.Models.Entities.FCGuildServer", b =>
@@ -195,11 +211,6 @@ namespace Darjeeling.Migrations
                         .IsRequired();
 
                     b.Navigation("FCMembers");
-                });
-
-            modelBuilder.Entity("Darjeeling.Models.Entities.FCMember", b =>
-                {
-                    b.Navigation("NameHistories");
                 });
 #pragma warning restore 612, 618
         }

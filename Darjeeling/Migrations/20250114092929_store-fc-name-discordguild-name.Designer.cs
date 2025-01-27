@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Darjeeling.Migrations
 {
     [DbContext(typeof(Repositories.DataContext))]
-    [Migration("20250111211230_initial-schema")]
-    partial class initialschema
+    [Migration("20250114092929_store-fc-name-discordguild-name")]
+    partial class storefcnamediscordguildname
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,7 +81,15 @@ namespace Darjeeling.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("DiscordGuildName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("DiscordGuildUid")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FreeCompanyName")
                         .IsRequired()
                         .HasColumnType("text");
 
