@@ -6,7 +6,7 @@ public class FCGuildRole
     public string RoleId { get; set; }
     public string RoleName { get; set; }
     public string DiscordGuildUid { get; set; }
-    public string FreeCompanyId { get; set; }
+    // Remove FreeCompanyId in Next Migration
     public DateTime DateCreated { get; set; }
     public RoleType RoleType { get; set; }
     

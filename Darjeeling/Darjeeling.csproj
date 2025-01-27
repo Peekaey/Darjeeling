@@ -31,8 +31,4 @@
         <Link>.dockerignore</Link>
       </Content>
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Repositories\" />
-    </ItemGroup>
 </Project>

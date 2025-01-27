@@ -1,7 +1,9 @@
 using System.Collections.Immutable;
+using Darjeeling.DataContext.Repositories;
 using Darjeeling.Helpers;
 using Darjeeling.Helpers.LodestoneHelpers;
 using Darjeeling.Interfaces;
+using Darjeeling.Interfaces.Repositories;
 using Darjeeling.Models;
 using Darjeeling.Repositories;
 using Darjeeling.Services;
@@ -25,7 +27,7 @@ public class Program
         Console.WriteLine("Starting Discord Bot....");
         
         var botToken = Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN");
-        botToken = "";
+
         if (string.IsNullOrEmpty(botToken))
         {
             await Console.Error.WriteLineAsync("DISCORD_BOT_TOKEN environment variable is not set.");
@@ -33,21 +35,13 @@ public class Program
         }
         
         var postgresConnectionString = Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING");
-        postgresConnectionString = "Host=localhost;Database=;Username=;Password=;";
         
-        // if (string.IsNullOrEmpty(postgresConnectionString))
-        // {
-        //     await Console.Error.WriteLineAsync("POSTGRES_CONNECTION_STRING environment variable is not set.");
-        //     throw new InvalidOperationException("POSTGRES_CONNECTION_STRING environment variable is not set.");
-        // }
-        //
+        if (string.IsNullOrEmpty(postgresConnectionString))
+        {
+            await Console.Error.WriteLineAsync("POSTGRES_CONNECTION_STRING environment variable is not set.");
+            throw new InvalidOperationException("POSTGRES_CONNECTION_STRING environment variable is not set.");
+        }
         
-        // var discordChannelId = Environment.GetEnvironmentVariable("DISCORD_CHANNEL_ID");
-        // if (string.IsNullOrEmpty(discordChannelId) || !ulong.TryParse(discordChannelId, out _))
-        // {
-        //     await Console.Error.WriteLineAsync("DISCORD_CHANNEL_ID environment variable is not set");
-        //     throw new InvalidOperationException("DISCORD_CHANNEL_ID environment variable is not set");
-        // }
         
         // Build Host
         var builder = Host.CreateApplicationBuilder(args);
@@ -81,7 +75,17 @@ public class Program
         services.AddSingleton<IPermissionHelpers, PermissionHelpers>();
         services.AddSingleton<ILodestoneApi, LodestoneApi>();
         services.AddSingleton<IMappingHelper, MappingHelper>();
-        services.AddSingleton<IDomainService, DomainService>();
+        services.AddScoped<IDomainService, DomainService>();
+        services.AddSingleton<IDiscordBackendApiService,DiscordBackendApiService>();
+        
+        
+        // Database Services
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IFCGuildMemberRepository, FCGuildMemberRepository>();
+        services.AddScoped<IFCGuildServerRepository, FCGuildServerRepository>();
+        services.AddScoped<IFCGuildRoleRepository, FCGuildRoleRepository>();
+        services.AddScoped<INameHistoryRepository, NameHistoryRepository>();
+        
 
 
         // Intents
@@ -133,7 +137,7 @@ public class Program
     
     private static void ConfigureDatabaseService(IServiceCollection services, string postgresConnectionString)
     {
-        services.AddDbContext<DataContext>(options =>
+        services.AddDbContext<Repositories.DataContext>(options =>
         {
             options.UseNpgsql(postgresConnectionString)
                 .LogTo(Console.WriteLine, LogLevel.Information);
@@ -145,7 +149,7 @@ public class Program
         using (var scope = host.Services.CreateScope())
         {
             try {
-                var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<Repositories.DataContext>();
                 if (!dbContext.Database.CanConnect())
                 {
                     throw new ApplicationException("Unable to connect to database.");

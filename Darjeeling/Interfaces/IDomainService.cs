@@ -6,5 +6,5 @@ namespace Darjeeling.Interfaces;
 
 public interface IDomainService
 {
-    Task<ServiceResult> RegisterFCGuildServer(RegisterFCGuildServerDTO registerFcGuildServerDto, List<LodestoneFCMember> fcMembers);
+    Task<ServiceResult> RegisterFCGuildServer(RegisterFCGuildServerDTO registerFcGuildServerDto);
 }
