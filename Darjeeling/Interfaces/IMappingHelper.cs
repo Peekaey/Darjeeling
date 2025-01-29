@@ -1,3 +1,4 @@
+using Darjeeling.Models;
 using Darjeeling.Models.DTOs;
 using Darjeeling.Models.Entities;
 using Darjeeling.Models.LodestoneEntities;
@@ -12,5 +13,9 @@ public interface IMappingHelper
     Task<FCGuildRole> MapRegisterFCGuildServerDTOToFCGuildRoleAdmin(RegisterFCGuildServerDTO registerFcGuildServerDto,
         Role guildRole);
 
-    Task<FCGuildServer> MapRegisterFCGuildServerDTOToFCGuildServer(RegisterFCGuildServerDTO registerFcGuildServerDto, List<FCGuildMember> fcGuildMembers);
+    Task<FCGuildServer> MapRegisterFCGuildServerDTOToFCGuildServer(
+        RegisterFCGuildServerDTO registerFcGuildServerDto, List<FCGuildMember> fcGuildMembers, FCGuildRole fcGuildRole);
+
+    Task<UpdatedFCMembersResult> MapMatchedLodestoneMemberToExistingFCGuildMember(List<FCGuildMember> lodestoneFcGuildMembers, 
+        List<FCGuildMember> existingFcGuildMembers);
 }

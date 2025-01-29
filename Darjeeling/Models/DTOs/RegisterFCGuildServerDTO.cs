@@ -10,6 +10,7 @@ public class RegisterFCGuildServerDTO
     public ICollection<LodestoneFCMember> FcMembers { get; set; }
     public string DiscordGuildName { get; set; }
     public string FreeCompanyName { get; set; } 
+    public string FreeCompanyId { get; set; }
     public string AdminChannelId { get; set; }
     
 }

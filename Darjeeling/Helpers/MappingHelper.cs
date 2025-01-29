@@ -59,7 +59,63 @@ public class MappingHelper : IMappingHelper
 
         return fcMembers;
     }
-    
+
+    public async Task<UpdatedFCMembersResult> MapMatchedLodestoneMemberToExistingFCGuildMember(
+        List<FCGuildMember> lodestoneFcGuildMembers, List<FCGuildMember> existingFcGuildMembers)
+    {
+        List<FCGuildMember> updatedFcGuildMembers = new List<FCGuildMember>();
+        List<FCGuildMember> newFcGuildMembers = new List<FCGuildMember>();
+        foreach (var lodestoneFcMember in lodestoneFcGuildMembers)
+        {
+            foreach (var existingFcMember in existingFcGuildMembers)
+            {
+                if (existingFcMember.LodestoneId == lodestoneFcMember.LodestoneId)
+                {
+                    if (existingFcMember.LodestoneNameHistories.First().FirstName !=
+                        lodestoneFcMember.LodestoneNameHistories.First().FirstName ||
+                        existingFcMember.LodestoneNameHistories.First().LastName !=
+                        lodestoneFcMember.LodestoneNameHistories.First().LastName)
+                    {
+                        existingFcMember.LodestoneNameHistories.Add(new LodestoneNameHistory
+                        {
+                            FirstName = lodestoneFcMember.LodestoneNameHistories.First().FirstName,
+                            LastName = lodestoneFcMember.LodestoneNameHistories.First().LastName,
+                            DateAdded = DateTime.UtcNow
+                        });
+                    }
+
+                    if (existingFcMember.DiscordNameHistories.First().DiscordUsername !=
+                        lodestoneFcMember.DiscordNameHistories.First().DiscordUsername ||
+                        existingFcMember.DiscordNameHistories.First().DiscordNickName !=
+                        lodestoneFcMember.DiscordNameHistories.First().DiscordNickName)
+                    {
+                        existingFcMember.DiscordNameHistories.Add(new DiscordNameHistory
+                        {
+                            DiscordUsername = lodestoneFcMember.DiscordNameHistories.First().DiscordUsername,
+                            DiscordNickName = lodestoneFcMember.DiscordNameHistories.First().DiscordNickName,
+                            DateAdded = DateTime.UtcNow
+                        });
+                    }
+                    updatedFcGuildMembers.Add(existingFcMember);
+                    break;
+                }
+
+                newFcGuildMembers.Add(new FCGuildMember
+                {
+                    DiscordUserUId = lodestoneFcMember.DiscordUserUId,
+                    LodestoneId = lodestoneFcMember.LodestoneId,
+                    LodestoneNameHistories = lodestoneFcMember.LodestoneNameHistories,
+                    DiscordNameHistories = lodestoneFcMember.DiscordNameHistories
+                });
+            }
+        }
+        return new UpdatedFCMembersResult
+        {
+            UpdatedFCGuildMembers = updatedFcGuildMembers,
+            NewFCGuildMembers = newFcGuildMembers
+        };
+    }
+
     
     public async Task<FCGuildRole> MapRegisterFCGuildServerDTOToFCGuildRoleAdmin(
         RegisterFCGuildServerDTO registerFcGuildServerDto, Role guildRole)
@@ -75,7 +131,7 @@ public class MappingHelper : IMappingHelper
     }
 
     public async Task<FCGuildServer> MapRegisterFCGuildServerDTOToFCGuildServer(
-        RegisterFCGuildServerDTO registerFcGuildServerDto, List<FCGuildMember> fcGuildMembers)
+        RegisterFCGuildServerDTO registerFcGuildServerDto, List<FCGuildMember> fcGuildMembers, FCGuildRole fcGuildRole)
     {
         return new FCGuildServer
         {
@@ -85,7 +141,9 @@ public class MappingHelper : IMappingHelper
             FCMembers = fcGuildMembers,
             DiscordGuildName = registerFcGuildServerDto.DiscordGuildName,
             FreeCompanyName = registerFcGuildServerDto.FreeCompanyName,
-            AdminChannelId = registerFcGuildServerDto.AdminChannelId
+            AdminChannelId = registerFcGuildServerDto.AdminChannelId,
+            FreeCompanyId = registerFcGuildServerDto.FreeCompanyId,
+            FCAdminRole = fcGuildRole
         };
     }
     

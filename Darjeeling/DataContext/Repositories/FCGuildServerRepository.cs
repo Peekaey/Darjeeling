@@ -24,5 +24,9 @@ public class FCGuildServerRepository : IFCGuildServerRepository
         _context.FCGuildServers.RemoveRange(server);
     }
     
+    public async Task<FCGuildServer?> GetGuildServerByDiscordGuildUid(string discordGuildUid)
+    {
+        return _context.FCGuildServers.FirstOrDefault(fcg => fcg.DiscordGuildUid == discordGuildUid);
+    }
     
 }

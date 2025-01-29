@@ -3,6 +3,7 @@ using System;
 using Darjeeling.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,10 +11,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Darjeeling.Migrations
 {
-    [DbContext(typeof(Repositories.DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(DataContext))]
+    [Migration("20250128065049_store_freecompany_lodestone_id")]
+    partial class store_freecompany_lodestone_id
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

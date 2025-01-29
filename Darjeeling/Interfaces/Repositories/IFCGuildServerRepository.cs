@@ -6,4 +6,5 @@ public interface IFCGuildServerRepository
 {
     Task AddAsync(FCGuildServer server);
     Task RemoveAsync(FCGuildServer server);
+    Task<FCGuildServer?> GetGuildServerByDiscordGuildUid(string discordGuildUid);
 }

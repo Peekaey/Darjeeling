@@ -9,6 +9,7 @@ public class FCGuildServer
     public ICollection<FCGuildMember> FCMembers { get; set; }
     public string DiscordGuildName { get; set; }
     public string FreeCompanyName { get; set; }
+    public string FreeCompanyId { get; set; }
     public string AdminChannelId { get; set; }
     
     // Role to control who can run administrative commands

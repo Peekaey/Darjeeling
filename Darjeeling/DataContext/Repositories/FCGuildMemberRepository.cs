@@ -1,5 +1,6 @@
 ﻿using Darjeeling.Interfaces.Repositories;
 using Darjeeling.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Darjeeling.DataContext.Repositories;
 
@@ -22,6 +23,16 @@ public class FCGuildMemberRepository : IFCGuildMemberRepository
     public async Task RemoveRangeAsync(List<FCGuildMember> member)
     {
         _context.FCMembers.RemoveRange(member);
+    }
+    
+    public async Task UpdateRangeAsync(List<FCGuildMember> member)
+    {
+        _context.FCMembers.UpdateRange(member);
+    }
+
+    public async Task<List<FCGuildMember>> GetGuildMembersByGuildId(int guildId)
+    {
+        return await _context.FCMembers.Where(fcm => fcm.FCGuildServerId == guildId).ToListAsync();
     }
 
 }

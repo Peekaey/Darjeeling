@@ -7,4 +7,5 @@ namespace Darjeeling.Interfaces;
 public interface IDomainService
 {
     Task<RegisterServiceResult> RegisterFCGuildServer(RegisterFCGuildServerDTO registerFcGuildServerDto);
+    Task<ServiceResult> UpdatedMemberData(ulong guildId);
 }

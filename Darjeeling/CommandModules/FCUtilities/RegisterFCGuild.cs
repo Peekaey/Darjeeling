@@ -56,7 +56,8 @@ public class RegisterFCGuild : ApplicationCommandModule<SlashCommandContext>
                     DiscordGuildName = Context.Guild.Name,
                     FreeCompanyName = webResult.FreeCompanyName,
                     FcMembers = webResult.Members,
-                    AdminChannelId = adminchannelid
+                    AdminChannelId = adminchannelid,
+                    FreeCompanyId = fcid
                 };
 
                 var registerResult = await _domainService.RegisterFCGuildServer(registerFcGuildServerDto);
