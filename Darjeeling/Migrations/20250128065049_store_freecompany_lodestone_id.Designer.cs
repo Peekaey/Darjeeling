@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Darjeeling.Migrations
 {
-    [DbContext(typeof(DataContext))]
+    [DbContext(typeof(Repositories.DataContext))]
     [Migration("20250128065049_store_freecompany_lodestone_id")]
     partial class store_freecompany_lodestone_id
     {
