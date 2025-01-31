@@ -78,6 +78,7 @@ public class Program
         services.AddSingleton<IMappingHelper, MappingHelper>();
         services.AddScoped<IDomainService, DomainService>();
         services.AddSingleton<IDiscordBackendApiService,DiscordBackendApiService>();
+        services.AddSingleton<ICsvHelper, Helpers.CsvHelper>();
         
         
         // Database Services

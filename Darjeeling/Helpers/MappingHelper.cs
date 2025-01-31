@@ -146,5 +146,26 @@ public class MappingHelper : IMappingHelper
             FCAdminRole = fcGuildRole
         };
     }
+
+    public async Task<List<FCGuildMemberDTO>> MapFCGuildMemberToFCGUildMemberDTO(List<FCGuildMember> fcGuildMembers)
+    {
+        List<FCGuildMemberDTO> fcGuildMemberDtos = new List<FCGuildMemberDTO>();
+
+        foreach (var fcGuildMember in fcGuildMembers)
+        {
+            fcGuildMemberDtos.Add(new FCGuildMemberDTO
+            {
+                // Deference of null however fcguildMember can't be created without an initial discord/lodestone name history
+                // TODO Fix Nullable Reference Types (only cosmetic for now)
+                DiscordUsername = fcGuildMember.DiscordNameHistories.OrderByDescending(dnh => dnh.DateAdded).FirstOrDefault().DiscordUsername,
+                DiscordNickname = fcGuildMember.DiscordNameHistories.OrderByDescending(dnh => dnh.DateAdded).FirstOrDefault().DiscordNickName,
+                LodestoneCharacterId = fcGuildMember.LodestoneId,
+                LodestoneFirstName = fcGuildMember.LodestoneNameHistories.OrderByDescending(lnh => lnh.DateAdded).FirstOrDefault().FirstName,
+                LodestoneLastName = fcGuildMember.LodestoneNameHistories.OrderByDescending(lnh => lnh.DateAdded).FirstOrDefault().LastName
+            });
+        }
+
+        return fcGuildMemberDtos;
+    }
     
 }

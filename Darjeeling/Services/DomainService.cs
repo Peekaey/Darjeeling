@@ -16,7 +16,7 @@ public class DomainService : IDomainService
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILodestoneApi _lodestoneApi;
     
-    public DomainService(ILogger<DomainService> logger, IMappingHelper mappingHelper, IDiscordBackendApiService discordBackendApiService, Interfaces.IUnitOfWork unitOfWork, ILodestoneApi lodestoneApi)
+    public DomainService(ILogger<DomainService> logger, IMappingHelper mappingHelper, IDiscordBackendApiService discordBackendApiService, IUnitOfWork unitOfWork, ILodestoneApi lodestoneApi)
     {
         _logger = logger;
         _mappingHelper = mappingHelper;
@@ -84,7 +84,7 @@ public class DomainService : IDomainService
         
         // TODO Investigate further on type of deletion logic based on if leave discord guild or leave FC
         // Match Members To Existing Members
-        var dbGuildMembers = await _unitOfWork.FCGuildMemberRepository.GetGuildMembersByGuildId((int)guildId);
+        var dbGuildMembers = await _unitOfWork.FCGuildMemberRepository.GetGuildMembersByGuildId(guildId.ToString());
         var updatedFcGuildMemberList = await _mappingHelper.MapMatchedLodestoneMemberToExistingFCGuildMember(matchedFcMembers, dbGuildMembers);
         
         
@@ -110,6 +110,26 @@ public class DomainService : IDomainService
         
         return ServiceResult.AsSuccess();
 
+    }
+
+    public async Task<List<FCGuildMemberDTO?>> GetRegisteredFCGuildMembers(ulong guildId)
+    {
+        var guild = await _unitOfWork.FCGuildServerRepository.GetGuildServerByDiscordGuildUid(guildId.ToString());
+        if (guild == null)
+        {
+            return null;
+        }
+        
+        var registeredMembers = await _unitOfWork.FCGuildMemberRepository.GetGuildMembersByGuildId(guildId.ToString());
+        
+        if (registeredMembers.Count == 0)
+        {
+            return null;
+        }
+        
+        var mappedDtos = await _mappingHelper.MapFCGuildMemberToFCGUildMemberDTO(registeredMembers);
+        return mappedDtos;
+        
     }
     
 }

@@ -18,4 +18,6 @@ public interface IMappingHelper
 
     Task<UpdatedFCMembersResult> MapMatchedLodestoneMemberToExistingFCGuildMember(List<FCGuildMember> lodestoneFcGuildMembers, 
         List<FCGuildMember> existingFcGuildMembers);
+
+    Task<List<FCGuildMemberDTO>> MapFCGuildMemberToFCGUildMemberDTO(List<FCGuildMember> fcGuildMembers);
 }

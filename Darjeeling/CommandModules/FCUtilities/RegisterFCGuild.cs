@@ -35,6 +35,7 @@ public class RegisterFCGuild : ApplicationCommandModule<SlashCommandContext>
     {
         try
         {
+            // TODO Move WebResult Logic to DomainService like UpdateMemberData
             _logger.LogActionTraceStart(Context, "ReturnRegisterFCGuild");
             await Context.Interaction.SendResponseAsync(InteractionCallback.DeferredMessage());
 
