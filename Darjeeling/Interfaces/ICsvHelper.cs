@@ -4,5 +4,5 @@ namespace Darjeeling.Interfaces;
 
 public interface ICsvHelper
 {
-    Task<MemoryStream> CreateMemberListCsv(List<FCGuildMemberDTO> fcGuildMembers);
+    Task<MemoryStream> CreateTableCsv<T>(List<T> records);
 }

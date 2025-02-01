@@ -1,5 +1,6 @@
 using Darjeeling.Helpers;
 using Darjeeling.Interfaces;
+using Darjeeling.Models.LodestoneEntities;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 
@@ -9,11 +10,14 @@ public class GetFreeCompanyMemberList : ApplicationCommandModule<SlashCommandCon
 {
     private readonly ILogger<GetFreeCompanyMemberList> _logger;
     private readonly ILodestoneApi _lodestoneApi;
-    public GetFreeCompanyMemberList(ILogger<GetFreeCompanyMemberList> logger, ILodestoneApi lodestoneApi)
+    private readonly ICsvHelper _csvHelper;
+    public GetFreeCompanyMemberList(ILogger<GetFreeCompanyMemberList> logger, ILodestoneApi lodestoneApi, ICsvHelper csvHelper)
     {
         _logger = logger;
         _lodestoneApi = lodestoneApi;
+        _csvHelper = csvHelper;
     }
+
 
     [SlashCommand("getfreecompanylist", "Returns a list of the members within the FC from the lodestone")]
     public async Task ReturnFreeCompanyMemberList([SlashCommandParameter(Name = "fcid", Description = "Free Company ID")] string fcid)
@@ -29,14 +33,17 @@ public class GetFreeCompanyMemberList : ApplicationCommandModule<SlashCommandCon
             {
                 await Context.Interaction.SendFollowupMessageAsync(new InteractionMessageProperties
                 {
-                    Content = $"Error occured when running getfreecompanylist command"
+                    Content = $"Unable to get data from Lodestone"
                 });
             }
             else
             {
+                var memoryStream = await _csvHelper.CreateTableCsv(webResult.Members.ToList());
+                var attachment = new AttachmentProperties("FreeCompanyMemberList.csv", memoryStream);
                 await Context.Interaction.SendFollowupMessageAsync(new InteractionMessageProperties
                 {
-                    Content = $"Free Company Member List for {webResult.FreeCompanyName} is: {webResult.ConcatenatedMembers}"
+                    Content = $"Free Company Member List for {webResult.FreeCompanyName}",
+                    Attachments = new List<AttachmentProperties> {attachment}
                 });
             }
             _logger.LogActionTraceFinish(Context, "ReturnFreeCompanyMemberList");

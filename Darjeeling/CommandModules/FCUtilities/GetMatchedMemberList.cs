@@ -29,7 +29,7 @@ public class GetMatchedMemberList : ApplicationCommandModule<SlashCommandContext
 
             if (matchedMembers.Count > 0)
             {
-                var memoryStream = await _csvHelper.CreateMemberListCsv(matchedMembers);
+                var memoryStream = await _csvHelper.CreateTableCsv(matchedMembers);
                 var attachment = new AttachmentProperties("RegisteredFCGuildMemberList.csv", memoryStream);
                 await Context.Interaction.SendFollowupMessageAsync(new InteractionMessageProperties
                 {

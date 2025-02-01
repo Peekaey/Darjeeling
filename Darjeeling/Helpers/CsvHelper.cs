@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Darjeeling.Interfaces;
@@ -9,7 +9,7 @@ namespace Darjeeling.Helpers;
 public class CsvHelper : ICsvHelper
 {
     
-    public async Task<MemoryStream> CreateMemberListCsv(List<FCGuildMemberDTO> fcGuildMembers)
+    public async Task<MemoryStream> CreateTableCsv<T>(List<T> records)
     {
         var memoryStream = new MemoryStream();
 
@@ -17,7 +17,7 @@ public class CsvHelper : ICsvHelper
         {
             await using (var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)))
             {
-                await csv.WriteRecordsAsync(fcGuildMembers);
+                await csv.WriteRecordsAsync(records);
                 await writer.FlushAsync();
                 memoryStream.Position = 0;
             }
