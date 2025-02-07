@@ -1,6 +1,7 @@
 using Darjeeling.Helpers;
 using Darjeeling.Interfaces;
 using Darjeeling.Models.LodestoneEntities;
+using Microsoft.Extensions.Logging;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 

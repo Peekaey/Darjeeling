@@ -1,5 +1,6 @@
 ﻿using Darjeeling.Helpers;
 using Darjeeling.Interfaces;
+using Microsoft.Extensions.Logging;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 

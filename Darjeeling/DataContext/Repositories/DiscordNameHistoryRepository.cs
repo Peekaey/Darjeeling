@@ -1,5 +1,6 @@
 using Darjeeling.Interfaces.Repositories;
 using Darjeeling.Models.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace Darjeeling.DataContext.Repositories;
 

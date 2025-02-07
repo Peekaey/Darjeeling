@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using NetCord.Services.ApplicationCommands;
 
 namespace Darjeeling.Helpers;
