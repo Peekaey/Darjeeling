@@ -11,13 +11,15 @@ public class GetLodestoneCharacterId : ApplicationCommandModule<SlashCommandCont
 {
     private readonly ILogger<GetLodestoneCharacterId> _logger;
     private readonly ILodestoneApi _lodestoneApi;
-    public GetLodestoneCharacterId(ILogger<GetLodestoneCharacterId> logger, ILodestoneApi lodestoneApi)
+    private readonly IPermissionHelpers _permissionHelpers;
+    public GetLodestoneCharacterId(ILogger<GetLodestoneCharacterId> logger, ILodestoneApi lodestoneApi,
+        IPermissionHelpers permissionHelpers)
     {
         _logger = logger;
         _lodestoneApi = lodestoneApi;
+        _permissionHelpers = permissionHelpers;
     }
-
-        
+    
     [SlashCommand("getcharacterid", "Returns the Lodestone Character ID of a user")]
     public async Task ReturnLodestoneCharacterId([SlashCommandParameter(Name = "firstname", Description = "First Name")] string firstName ,
         [SlashCommandParameter(Name = "lastname", Description = "Last Name")] string lastName,
@@ -26,6 +28,17 @@ public class GetLodestoneCharacterId : ApplicationCommandModule<SlashCommandCont
         try {
             _logger.LogActionTraceStart(Context, "ReturnLodestoneCharacterId");
             await Context.Interaction.SendResponseAsync(InteractionCallback.DeferredMessage());
+            
+            var isGuildSetup = await _permissionHelpers.CheckRegisteredGuildPermissions(Context.Guild.Id, Context.User.Id);
+            
+            if (isGuildSetup.Success == false)
+            {
+                await Context.Interaction.SendFollowupMessageAsync(new InteractionMessageProperties
+                {
+                    Content = isGuildSetup.ErrorMessage
+                });
+                return;
+            }
             
             var webResult = await _lodestoneApi.GetLodestoneCharacterId(firstName, lastName, world);
 

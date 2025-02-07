@@ -12,13 +12,16 @@ public class GetFreeCompanyMemberList : ApplicationCommandModule<SlashCommandCon
     private readonly ILogger<GetFreeCompanyMemberList> _logger;
     private readonly ILodestoneApi _lodestoneApi;
     private readonly ICsvHelper _csvHelper;
-    public GetFreeCompanyMemberList(ILogger<GetFreeCompanyMemberList> logger, ILodestoneApi lodestoneApi, ICsvHelper csvHelper)
+    private readonly IPermissionHelpers _permissionHelpers;
+    public GetFreeCompanyMemberList(ILogger<GetFreeCompanyMemberList> logger, ILodestoneApi lodestoneApi, ICsvHelper csvHelper,
+        IPermissionHelpers permissionHelpers)
     {
         _logger = logger;
         _lodestoneApi = lodestoneApi;
         _csvHelper = csvHelper;
+        _permissionHelpers = permissionHelpers;
     }
-
+    
 
     [SlashCommand("getfreecompanylist", "Returns a list of the members within the FC from the lodestone")]
     public async Task ReturnFreeCompanyMemberList([SlashCommandParameter(Name = "fcid", Description = "Free Company ID")] string fcid)
@@ -27,6 +30,18 @@ public class GetFreeCompanyMemberList : ApplicationCommandModule<SlashCommandCon
         {
             _logger.LogActionTraceStart(Context, "ReturnFreeCompanyMemberList");
             await Context.Interaction.SendResponseAsync(InteractionCallback.DeferredMessage());
+            
+            var isGuildSetup = await _permissionHelpers.CheckRegisteredGuildPermissions(Context.Guild.Id, Context.User.Id);
+            
+            if (isGuildSetup.Success == false)
+            {
+                await Context.Interaction.SendFollowupMessageAsync(new InteractionMessageProperties
+                {
+                    Content = isGuildSetup.ErrorMessage
+                });
+                return;
+            }
+            
             
             var webResult = await _lodestoneApi.GetLodestoneFreeCompanyMembers(fcid);
             

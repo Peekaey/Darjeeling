@@ -1,8 +1,10 @@
+using Darjeeling.Models;
 using NetCord;
 
 namespace Darjeeling.Interfaces;
 
 public interface IPermissionHelpers
 {
-    Task<Channel>? CanAccessChannel(ulong channelId);
+    Task<bool> IsGuildRegistered(ulong guildId);
+    Task<ServiceResult> CheckRegisteredGuildPermissions(ulong guildId, ulong userId);
 }

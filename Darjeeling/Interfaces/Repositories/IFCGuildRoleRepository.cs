@@ -6,4 +6,5 @@ public interface IFCGuildRoleRepository
 {
     Task AddAsync(FCGuildRole role);
     Task RemoveAsync(FCGuildRole role);
+    Task<FCGuildRole?> GetGuildRoleByDiscordGuildUid(string discordGuildUid);
 }

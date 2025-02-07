@@ -170,17 +170,5 @@ public class Program
         }
     }
     
-    private static async Task StartupCheckChannelAccess(IHost host, IHostApplicationLifetime lifetime)
-    {
-        var permissionHelper = host.Services.GetRequiredService<IPermissionHelpers>();
-        var appConfiguration = host.Services.GetRequiredService<AppConfiguration>();
-        var logger = host.Services.GetRequiredService<ILogger<Program>>();
-        
-        var channelAccess = await permissionHelper.CanAccessChannel(appConfiguration.ChannelId);
-        if (channelAccess == null)
-        {
-            logger.LogError("Could not confirm access to channel. Exiting application...");
-            lifetime.StopApplication();
-        }
-    }
+
 }

@@ -24,4 +24,9 @@ public class FCGuildRoleRepository : IFCGuildRoleRepository
     {
         _context.FCGuildRoles.RemoveRange(role);
     }
+    
+    public async Task<FCGuildRole?> GetGuildRoleByDiscordGuildUid(string discordGuildUid)
+    {
+        return _context.FCGuildRoles.FirstOrDefault(fcg => fcg.DiscordGuildUid == discordGuildUid);
+    }
 }

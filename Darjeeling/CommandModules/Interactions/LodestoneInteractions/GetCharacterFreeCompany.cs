@@ -10,10 +10,13 @@ public class GetCharacterFreeCompany : ApplicationCommandModule<SlashCommandCont
 {
     private readonly ILogger<GetCharacterFreeCompany> _logger;
     private readonly ILodestoneApi _lodestoneApi;
-    public GetCharacterFreeCompany(ILogger<GetCharacterFreeCompany> logger, ILodestoneApi lodestoneApi)
+    private readonly IPermissionHelpers _permissionHelpers;
+    public GetCharacterFreeCompany(ILogger<GetCharacterFreeCompany> logger, ILodestoneApi lodestoneApi,
+        IPermissionHelpers permissionHelpers)
     {
         _logger = logger;
         _lodestoneApi = lodestoneApi;
+        _permissionHelpers = permissionHelpers;
     }
     [SlashCommand("getfreecompany", "Returns the Free Company of a user")]
     public async Task ReturnCharacterFreeCompany([SlashCommandParameter(Name = "firstname", Description = "First Name")] string firstName ,
@@ -24,6 +27,17 @@ public class GetCharacterFreeCompany : ApplicationCommandModule<SlashCommandCont
         try {
             _logger.LogActionTraceStart(Context, "ReturnCharacterFreeCompany");
             await Context.Interaction.SendResponseAsync(InteractionCallback.DeferredMessage());
+            
+            var isGuildSetup = await _permissionHelpers.CheckRegisteredGuildPermissions(Context.Guild.Id, Context.User.Id);
+            
+            if (isGuildSetup.Success == false)
+            {
+                await Context.Interaction.SendFollowupMessageAsync(new InteractionMessageProperties
+                {
+                    Content = isGuildSetup.ErrorMessage
+                });
+                return;
+            }
             
             var webResult = await _lodestoneApi.GetLodestoneCharacterFreeCompany(firstName, lastName, world);
 

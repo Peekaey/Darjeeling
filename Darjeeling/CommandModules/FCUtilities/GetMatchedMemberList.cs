@@ -1,6 +1,7 @@
 ﻿using Darjeeling.Helpers;
 using Darjeeling.Interfaces;
 using Microsoft.Extensions.Logging;
+using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 
@@ -11,12 +12,15 @@ public class GetMatchedMemberList : ApplicationCommandModule<SlashCommandContext
     private readonly ILogger<GetMatchedMemberList> _logger;
     private readonly IDomainService _domainService;
     private readonly ICsvHelper _csvHelper;
+    private readonly IPermissionHelpers _permissionHelpers;
     
-    public GetMatchedMemberList(ILogger<GetMatchedMemberList> logger, IDomainService domainService, ICsvHelper csvHelper)
+    public GetMatchedMemberList(ILogger<GetMatchedMemberList> logger, IDomainService domainService, ICsvHelper csvHelper
+    , IPermissionHelpers permissionHelpers)
     {
         _logger = logger;
         _domainService = domainService;
         _csvHelper = csvHelper;
+        _permissionHelpers = permissionHelpers;
     }
     
     [SlashCommand("getmatchedmemberlist", "Returns a list of registered FC Guild Members from the database in a csv file")]
@@ -26,6 +30,19 @@ public class GetMatchedMemberList : ApplicationCommandModule<SlashCommandContext
         {
             _logger.LogActionTraceStart(Context, "ReturnGetMatchedMemberList");
             await Context.Interaction.SendResponseAsync(InteractionCallback.DeferredMessage());
+            
+            var isGuildSetup = await _permissionHelpers.CheckRegisteredGuildPermissions(Context.Guild.Id, Context.User.Id);
+            
+            if (isGuildSetup.Success == false)
+            {
+                await Context.Interaction.SendFollowupMessageAsync(new InteractionMessageProperties
+                {
+                    Content = isGuildSetup.ErrorMessage
+                });
+                return;
+            }
+            
+            
             var matchedMembers = await _domainService.GetRegisteredFCGuildMembers(Context.Guild.Id);
 
             if (matchedMembers.Count > 0)
