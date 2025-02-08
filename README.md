@@ -1,6 +1,6 @@
 # Darjeeling
 
-Discord bot as a .NET Generic Host using Netcord & Docker to match Lodestone FC character names with respective discord guild members for Free Company Discord users.
+Discord bot as a .NET Generic Host using Netcord & Docker to match FF14 Lodestone FC character names with respective discord guild members for Free Company Discord users.
 
 This works on the assumption of FC members are required to use their in-game name as their nickname within the Free Company discord Server.
 
