@@ -39,5 +39,13 @@ public class FCGuildMemberRepository : IFCGuildMemberRepository
             .Include(fcg => fcg.LodestoneNameHistories)
             .Where(fcg => fcg.FCGuildServer.DiscordGuildUid == guildId).ToListAsync<FCGuildMember>();
     }
+    
+    public async Task<FCGuildMember?> GetGuildMemberByDiscordUserId(string discordUserId)
+    {
+        return await _context.FCMembers
+            .Include(fcg => fcg.DiscordNameHistories)
+            .Include(fcg => fcg.LodestoneNameHistories)
+            .FirstOrDefaultAsync(fcg => fcg.DiscordUserUId == discordUserId);
+    }
 
 }

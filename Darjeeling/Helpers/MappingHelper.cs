@@ -176,4 +176,43 @@ public async Task<UpdatedFCMembersResult> MapMatchedLodestoneMemberToExistingFCG
         return fcGuildMemberDtos;
     }
     
+    public async Task<List<GuildMemberDTO>> MapGuildUserToGuildMemberDTO(List<GuildUser> guildUsers)
+    {
+        List<GuildMemberDTO> guildMemberDtos = new List<GuildMemberDTO>();
+        foreach (var guildUser in guildUsers)
+        {
+            guildMemberDtos.Add(new GuildMemberDTO
+            {
+                DiscordUsername = guildUser.Username,
+                DiscordGuildNickname = guildUser.Nickname ?? "",
+                DiscordNickName = guildUser.GlobalName ?? "",
+                DiscordUserId = guildUser.Id.ToString()
+            });
+        }
+        return guildMemberDtos;
+    }
+
+    public async Task<GuildMemberNameHistoryDTO> MapGuildUserToGuildMemberNameHistoryDTO(FCGuildMember guildUser)
+    {
+        return new GuildMemberNameHistoryDTO
+        {
+            DiscordNameHistories = guildUser.DiscordNameHistories
+                .OrderByDescending(dnh => dnh.DateAdded)
+                .Select(dnh => new DiscordNameHistoryDTO
+                {
+                    DiscordUsername = dnh.DiscordUsername,
+                    DiscordNickName = dnh.DiscordNickName,
+                    DiscordGuildNickname = dnh.DiscordGuildNickname,
+                    DateAdded = dnh.DateAdded
+                }).ToList(),
+            LodestoneNameHistories = guildUser.LodestoneNameHistories
+                .OrderByDescending(lnh => lnh.DateAdded)
+                .Select(lnh => new LodestoneNameHistoryDTO
+                {
+                    FirstName = lnh.FirstName,
+                    LastName = lnh.LastName,
+                    DateAdded = lnh.DateAdded
+                }).ToList()
+        };
+    }
 }

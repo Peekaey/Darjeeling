@@ -31,7 +31,7 @@ public class GetFreeCompanyMemberList : ApplicationCommandModule<SlashCommandCon
             _logger.LogActionTraceStart(Context, "ReturnFreeCompanyMemberList");
             await Context.Interaction.SendResponseAsync(InteractionCallback.DeferredMessage());
             
-            var isGuildSetup = await _permissionHelpers.CheckRegisteredGuildPermissions(Context.Guild.Id, Context.User.Id);
+            var isGuildSetup = await _permissionHelpers.CheckRegisteredGuildPermissions(Context.Guild.Id, Context.User.Id, Context.Channel.Id);
             
             if (isGuildSetup.Success == false)
             {

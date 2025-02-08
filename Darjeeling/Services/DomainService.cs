@@ -133,4 +133,21 @@ public class DomainService : IDomainService
         
     }
     
+    public async Task<List<GuildMemberDTO>> GetGuildMembers(ulong guildId)
+    {
+        var guildMembers = await _discordBackendApiService.GetGuildMembers(guildId);
+        return  await _mappingHelper.MapGuildUserToGuildMemberDTO(guildMembers);
+    }
+    
+    public async Task<GuildMemberNameHistoryDTO?> GetMatchedMemberNameHistoryList(ulong userId)
+    {
+        var guildMember = await _unitOfWork.FCGuildMemberRepository.GetGuildMemberByDiscordUserId(userId.ToString());
+        if (guildMember == null)
+        {
+            return null;
+        }
+        return await _mappingHelper.MapGuildUserToGuildMemberNameHistoryDTO(guildMember);
+        
+    }
+    
 }

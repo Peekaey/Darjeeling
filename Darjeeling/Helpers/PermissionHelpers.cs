@@ -72,13 +72,42 @@ public class PermissionHelpers : IPermissionHelpers
         }
     }
     
-    public async Task<ServiceResult> CheckRegisteredGuildPermissions(ulong guildId, ulong userIds)
+    public async Task<bool> IsSpokenChannelRegisteredAsAdminChannel(ulong guildId, ulong channelId)
+    {
+        using (var scope = _serviceProvider.CreateScope())
+        {
+            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var guild = await unitOfWork.FCGuildServerRepository.GetGuildServerByDiscordGuildUid(guildId.ToString());
+            
+            if (guild == null)
+            {
+                return false;
+            }
+            
+            if (guild.AdminChannelId != channelId.ToString())
+            {
+                return false;
+            }
+
+            return true;
+            
+        }
+    }
+    
+    public async Task<ServiceResult> CheckRegisteredGuildPermissions(ulong guildId, ulong userIds, ulong interactionChannelId)
     {
         var isGuildRegistered = await IsGuildRegistered(guildId);
         
         if (!isGuildRegistered)
         {
             return ServiceResult.AsFailure("Guild not registered");
+        }
+        
+        var isSpokenChannelRegisteredAsAdminChannel = await IsSpokenChannelRegisteredAsAdminChannel(guildId, interactionChannelId);
+        
+        if (!isSpokenChannelRegisteredAsAdminChannel)
+        {
+            return ServiceResult.AsFailure("Interacted channel is not same as designated admin management channel");
         }
 
         var userRoleIds = await GetUserRoleIds(guildId, userIds);

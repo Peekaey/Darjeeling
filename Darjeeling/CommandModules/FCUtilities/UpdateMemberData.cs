@@ -29,7 +29,7 @@ public class UpdateMemberData : ApplicationCommandModule<SlashCommandContext>
             _logger.LogActionTraceStart(Context, "ReturnUpdateMemberData");
             await Context.Interaction.SendResponseAsync(InteractionCallback.DeferredMessage());
             
-            var isGuildSetup = await _permissionHelpers.CheckRegisteredGuildPermissions(Context.Guild.Id, Context.User.Id);
+            var isGuildSetup = await _permissionHelpers.CheckRegisteredGuildPermissions(Context.Guild.Id, Context.User.Id, Context.Channel.Id);
             
             if (isGuildSetup.Success == false)
             {

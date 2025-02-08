@@ -9,4 +9,5 @@ public interface IDomainService
     Task<RegisterServiceResult> RegisterFCGuildServer(RegisterFCGuildServerDTO registerFcGuildServerDto);
     Task<ServiceResult> UpdatedMemberData(ulong guildId);
     Task<List<FCGuildMemberDTO?>> GetRegisteredFCGuildMembers(ulong guildId);
+    Task<GuildMemberNameHistoryDTO?> GetMatchedMemberNameHistoryList(ulong userId);
 }

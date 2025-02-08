@@ -8,4 +8,5 @@ public interface IFCGuildMemberRepository
     Task RemoveRangeAsync(List<FCGuildMember> member);
     Task<List<FCGuildMember>> GetGuildMembersByGuildId(string guildId);
     Task UpdateRangeAsync(List<FCGuildMember> member);
+    Task<FCGuildMember?> GetGuildMemberByDiscordUserId(string discordUserId);
 }
