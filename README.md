@@ -31,7 +31,7 @@ Therefore depending on how your specific FC server is setup. This bot may not be
 
 ## Startup
 By default, none of the commands will work till the bot is registered to a guild/fc via the registerfcguild command. After each command execution the bot
-will check if the guild matches with one in the db and if any of the users role ID matches with the designated admin role ID as well as if the user is speaking
+will check if the guild matches with one stored in the database and if any of the users role ID matches with the designated admin role ID as well as if the user is speaking
 in the designated admin channel. If all conditions are met the command will be executed.
 
 ### Stored Data
