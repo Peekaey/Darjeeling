@@ -81,17 +81,17 @@ public class DomainService : IDomainService
         
         // Get Members
         var guildMembers = await _discordBackendApiService.GetGuildMembers(guildId);
-        var matchedFcMembers = await _mappingHelper.MapLodestoneFCMembersToFCMembers(webResult.Members.ToList(), guildMembers);
+        var matchedFcMembersWithLatestNameData = await _mappingHelper.MapLodestoneFCMembersToFCMembers(webResult.Members.ToList(), guildMembers);
         
         // TODO Investigate further on type of deletion logic based on if leave discord guild or leave FC
         // Match Members To Existing Members
         var dbGuildMembers = await _unitOfWork.FCGuildMemberRepository.GetGuildMembersByGuildId(guildId.ToString());
-        var updatedFcGuildMemberList = await _mappingHelper.MapMatchedLodestoneMemberToExistingFCGuildMember(matchedFcMembers, dbGuildMembers);
+        var updatedFcGuildMemberList = await _mappingHelper.MapMatchedLodestoneMemberToExistingFCGuildMember(matchedFcMembersWithLatestNameData, dbGuildMembers, guild.Id);
         
         
         //Get Members no longer in fc & delete
         var membersNotInFc = dbGuildMembers.Where(dbm => !updatedFcGuildMemberList.UpdatedFCGuildMembers.Contains(dbm)).ToList();
-        
+        await _unitOfWork.FCGuildMemberRepository.RemoveRangeAsync(membersNotInFc); 
         // Save to Database
         
         // Update Existing Members

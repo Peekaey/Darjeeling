@@ -5,6 +5,7 @@ public class DiscordNameHistory
     public int Id { get; set; }
     public string DiscordUsername { get; set; }
     public string DiscordNickName { get; set; }
+    public string DiscordGuildNickname { get; set; }
     public DateTime DateAdded { get; set; }
     // FK
     public int FCMemberId { get; }

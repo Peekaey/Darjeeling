@@ -3,6 +3,7 @@ using System;
 using Darjeeling.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Darjeeling.Migrations
 {
     [DbContext(typeof(Repositories.DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250208035524_add_DiscordNameHistory_GuildNickname")]
+    partial class add_DiscordNameHistory_GuildNickname
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

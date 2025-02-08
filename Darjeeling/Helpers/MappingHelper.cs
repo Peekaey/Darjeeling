@@ -45,8 +45,9 @@ public class MappingHelper : IMappingHelper
                             {
                                 new DiscordNameHistory
                                 {
-                                    DiscordUsername = member.GlobalName,
-                                    DiscordNickName = member.Nickname ?? member.Username,
+                                    DiscordUsername = member.Username,
+                                    DiscordGuildNickname = member.Nickname ?? "",
+                                    DiscordNickName = member.GlobalName ?? "",
                                     DateAdded = DateTime.UtcNow
                                 }
                             }
@@ -60,61 +61,67 @@ public class MappingHelper : IMappingHelper
         return fcMembers;
     }
 
-    public async Task<UpdatedFCMembersResult> MapMatchedLodestoneMemberToExistingFCGuildMember(
-        List<FCGuildMember> lodestoneFcGuildMembers, List<FCGuildMember> existingFcGuildMembers)
+public async Task<UpdatedFCMembersResult> MapMatchedLodestoneMemberToExistingFCGuildMember(
+    List<FCGuildMember> lodestoneFcGuildMembers, List<FCGuildMember> existingFcGuildMembers, int guildId)
+{
+    List<FCGuildMember> updatedFcGuildMembers = new List<FCGuildMember>();
+    List<FCGuildMember> newFcGuildMembers = new List<FCGuildMember>();
+
+    foreach (var lodestoneFcMember in lodestoneFcGuildMembers)
     {
-        List<FCGuildMember> updatedFcGuildMembers = new List<FCGuildMember>();
-        List<FCGuildMember> newFcGuildMembers = new List<FCGuildMember>();
-        foreach (var lodestoneFcMember in lodestoneFcGuildMembers)
+        var existingFcMember = existingFcGuildMembers.FirstOrDefault(m => m.DiscordUserUId == lodestoneFcMember.DiscordUserUId);
+        if (existingFcMember != null)
         {
-            foreach (var existingFcMember in existingFcGuildMembers)
+            bool isLodestoneNameChanged = existingFcMember.LodestoneNameHistories.OrderByDescending(h => h.DateAdded).First().FirstName != lodestoneFcMember.LodestoneNameHistories.First().FirstName ||
+                                          existingFcMember.LodestoneNameHistories.OrderByDescending(h => h.DateAdded).First().LastName != lodestoneFcMember.LodestoneNameHistories.First().LastName;
+
+            bool isDiscordNameChanged = existingFcMember.DiscordNameHistories.OrderByDescending(h => h.DateAdded).First().DiscordUsername != lodestoneFcMember.DiscordNameHistories.First().DiscordUsername ||
+                                        existingFcMember.DiscordNameHistories.OrderByDescending(h => h.DateAdded).First().DiscordNickName != lodestoneFcMember.DiscordNameHistories.First().DiscordNickName ||
+                                        existingFcMember.DiscordNameHistories.OrderByDescending(h => h.DateAdded).First().DiscordGuildNickname != lodestoneFcMember.DiscordNameHistories.First().DiscordGuildNickname;
+
+            if (isLodestoneNameChanged)
             {
-                if (existingFcMember.LodestoneId == lodestoneFcMember.LodestoneId)
+                existingFcMember.LodestoneNameHistories.Add(new LodestoneNameHistory
                 {
-                    if (existingFcMember.LodestoneNameHistories.First().FirstName !=
-                        lodestoneFcMember.LodestoneNameHistories.First().FirstName ||
-                        existingFcMember.LodestoneNameHistories.First().LastName !=
-                        lodestoneFcMember.LodestoneNameHistories.First().LastName)
-                    {
-                        existingFcMember.LodestoneNameHistories.Add(new LodestoneNameHistory
-                        {
-                            FirstName = lodestoneFcMember.LodestoneNameHistories.First().FirstName,
-                            LastName = lodestoneFcMember.LodestoneNameHistories.First().LastName,
-                            DateAdded = DateTime.UtcNow
-                        });
-                    }
-
-                    if (existingFcMember.DiscordNameHistories.First().DiscordUsername !=
-                        lodestoneFcMember.DiscordNameHistories.First().DiscordUsername ||
-                        existingFcMember.DiscordNameHistories.First().DiscordNickName !=
-                        lodestoneFcMember.DiscordNameHistories.First().DiscordNickName)
-                    {
-                        existingFcMember.DiscordNameHistories.Add(new DiscordNameHistory
-                        {
-                            DiscordUsername = lodestoneFcMember.DiscordNameHistories.First().DiscordUsername,
-                            DiscordNickName = lodestoneFcMember.DiscordNameHistories.First().DiscordNickName,
-                            DateAdded = DateTime.UtcNow
-                        });
-                    }
-                    updatedFcGuildMembers.Add(existingFcMember);
-                    break;
-                }
-
-                newFcGuildMembers.Add(new FCGuildMember
-                {
-                    DiscordUserUId = lodestoneFcMember.DiscordUserUId,
-                    LodestoneId = lodestoneFcMember.LodestoneId,
-                    LodestoneNameHistories = lodestoneFcMember.LodestoneNameHistories,
-                    DiscordNameHistories = lodestoneFcMember.DiscordNameHistories
+                    FirstName = lodestoneFcMember.LodestoneNameHistories.First().FirstName,
+                    LastName = lodestoneFcMember.LodestoneNameHistories.First().LastName,
+                    DateAdded = DateTime.UtcNow
                 });
             }
+
+            if (isDiscordNameChanged)
+            {
+                existingFcMember.DiscordNameHistories.Add(new DiscordNameHistory
+                {
+                    DiscordUsername = lodestoneFcMember.DiscordNameHistories.First().DiscordUsername,
+                    DiscordNickName = lodestoneFcMember.DiscordNameHistories.First().DiscordNickName,
+                    DiscordGuildNickname = lodestoneFcMember.DiscordNameHistories.First().DiscordGuildNickname,
+                    DateAdded = DateTime.UtcNow
+                });
+            }
+
+            updatedFcGuildMembers.Add(existingFcMember);
         }
-        return new UpdatedFCMembersResult
+        else
         {
-            UpdatedFCGuildMembers = updatedFcGuildMembers,
-            NewFCGuildMembers = newFcGuildMembers
-        };
+            newFcGuildMembers.Add(new FCGuildMember
+            {
+                DiscordUserUId = lodestoneFcMember.DiscordUserUId,
+                LodestoneId = lodestoneFcMember.LodestoneId,
+                LodestoneNameHistories = lodestoneFcMember.LodestoneNameHistories,
+                DiscordNameHistories = lodestoneFcMember.DiscordNameHistories,
+                FCGuildServerId = guildId,
+                DateCreated = DateTime.UtcNow
+            });
+        }
     }
+
+    return new UpdatedFCMembersResult
+    {
+        UpdatedFCGuildMembers = updatedFcGuildMembers,
+        NewFCGuildMembers = newFcGuildMembers
+    };
+}
 
     
     public async Task<FCGuildRole> MapRegisterFCGuildServerDTOToFCGuildRoleAdmin(
@@ -159,6 +166,7 @@ public class MappingHelper : IMappingHelper
                 // TODO Fix Nullable Reference Types (only cosmetic for now)
                 DiscordUsername = fcGuildMember.DiscordNameHistories.OrderByDescending(dnh => dnh.DateAdded).FirstOrDefault().DiscordUsername,
                 DiscordNickname = fcGuildMember.DiscordNameHistories.OrderByDescending(dnh => dnh.DateAdded).FirstOrDefault().DiscordNickName,
+                DiscordGuildNickName = fcGuildMember.DiscordNameHistories.OrderByDescending(dnh => dnh.DateAdded).FirstOrDefault().DiscordGuildNickname,
                 LodestoneCharacterId = fcGuildMember.LodestoneId,
                 LodestoneFirstName = fcGuildMember.LodestoneNameHistories.OrderByDescending(lnh => lnh.DateAdded).FirstOrDefault().FirstName,
                 LodestoneLastName = fcGuildMember.LodestoneNameHistories.OrderByDescending(lnh => lnh.DateAdded).FirstOrDefault().LastName

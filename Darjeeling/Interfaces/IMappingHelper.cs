@@ -17,7 +17,7 @@ public interface IMappingHelper
         RegisterFCGuildServerDTO registerFcGuildServerDto, List<FCGuildMember> fcGuildMembers, FCGuildRole fcGuildRole);
 
     Task<UpdatedFCMembersResult> MapMatchedLodestoneMemberToExistingFCGuildMember(List<FCGuildMember> lodestoneFcGuildMembers, 
-        List<FCGuildMember> existingFcGuildMembers);
+        List<FCGuildMember> existingFcGuildMembers, int guildId);
 
     Task<List<FCGuildMemberDTO>> MapFCGuildMemberToFCGUildMemberDTO(List<FCGuildMember> fcGuildMembers);
 }
