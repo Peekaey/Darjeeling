@@ -58,6 +58,5 @@ FCGuildServer:
 FCGuildRole:
 - DiscordRoleId
 - DiscordRoleName
-- 
 
 
